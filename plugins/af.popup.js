@@ -141,7 +141,7 @@
                 $el.find("header").show();
                 $el.find("footer").show();
                 setTimeout(function(){
-                    $el.removeClass("hidden").addClass("show");
+                    $el.removeClass("hidden");
                     self.onShow(self);
                 },50);
             },

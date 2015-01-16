@@ -128,7 +128,6 @@
             var $el = $(el);
 
             value = parseInt(value, 10);
-            if(isNaN(value)) return;
             if (!el.getAttribute("multiple")) {
                 el.selectedIndex = value;
                 $el.find("option").prop("selected", false);

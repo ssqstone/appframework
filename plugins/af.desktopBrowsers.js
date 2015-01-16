@@ -5,7 +5,7 @@
  *
  * @param {Function} $ The appframework selector function
  */
- /* global DocumentTouch*/
+/* global DocumentTouch*/
 (function ($) {
     "use strict";
     var cancelClickMove = false;
@@ -179,13 +179,36 @@
             prevX = e.clientX;
             prevY = e.clientY;
 
-            redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 2 : -2);
-            cancelClickMove = true;
+            if($.os.chrome)
+            {
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 1 : -1);
+                cancelClickMove = true;
 
-            redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 4 : -4);
-            cancelClickMove = true;
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 2 : -2);
+                cancelClickMove = true;
 
-            redirectMouseToTouch("touchend", e, lastTarget, false, val); //bind it to initial mousedown target
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 3 : -3);
+                cancelClickMove = true;
+
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 4 : -4);
+                cancelClickMove = true;
+            }
+            else
+            {
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 5 : -5);
+                cancelClickMove = true;
+
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 10 : -10);
+                cancelClickMove = true;
+
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 15 : -15);
+                cancelClickMove = true;
+
+                redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 20 : -20);
+                cancelClickMove = true;
+            }
+
+            redirectMouseToTouch("touchend", e, lastTarget); //bind it to initial mousedown target
             lastTarget = null;
         }
     }

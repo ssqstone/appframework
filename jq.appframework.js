@@ -89,7 +89,7 @@
         $.os.androidICS = $.os.android && userAgent.match(/(Android)\s4/) ? true : false;
         $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
         $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
-        $.os.ios7 = ($.os.ipad||$.os.iphone)&&userAgent.match(/7_/)||($.os.ipad||$.os.iphone)&&userAgent.match(/8_/) ? true : false;
+        $.os.ios7 = ($.os.ipad||$.os.iphone)&&userAgent.match(/7_/) ? true : false;
         $.os.webos = userAgent.match(/(webOS|hpwOS)[\s\/]([\d.]+)/) ? true : false;
         $.os.touchpad = $.os.webos && userAgent.match(/TouchPad/) ? true : false;
         $.os.ios = $.os.ipad || $.os.iphone;
@@ -104,10 +104,6 @@
         $.os.tizen = userAgent.match(/Tizen/i)?true:false;
         $.os.supportsTouch = ((window.DocumentTouch && document instanceof window.DocumentTouch) || "ontouchstart" in window);
         $.os.kindle=userAgent.match(/Silk-Accelerated/)?true:false;
-        if($.os.ios) {
-            if(Promise&&Promise.toString().indexOf("native")!==-1)
-                $.os.ios7=true;
-        }
         //features
         $.feat = {};
         var head = document.documentElement.getElementsByTagName("head")[0];

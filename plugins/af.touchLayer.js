@@ -31,7 +31,7 @@
     //configuration stuff
     var inputElements = ["input", "select", "textarea","range"];
     var autoBlurInputTypes = ["button", "radio", "checkbox", "range", "date"];
-    var requiresJSFocus = $.os.ios||($.os.androidICS&&$.os.chrome); //devices which require .focus() on dynamic click events
+    var requiresJSFocus = $.os.ios; //devices which require .focus() on dynamic click events
     var verySensitiveTouch = $.os.blackberry; //devices which have a very sensitive touch and touchmove is easily fired even on simple taps
     var inputElementRequiresNativeTap = $.os.blackberry||$.os.fennec || ($.os.android&&!$.os.androidICS); //devices which require the touchstart event to bleed through in order to actually fire the click on select elements
 //    var selectElementRequiresNativeTap = $.os.blackberry||$.os.fennec || ($.os.android && !$.os.chrome); //devices which require the touchstart event to bleed through in order to actually fire the click on select elements
@@ -201,10 +201,7 @@
             }
 
             //this.log("hiding address bar");
-            if($.os.ios7){
-                window.scrollTo(1, 1);
-            }
-            else if ($.os.desktop || $.os.kindle) {
+            if ($.os.desktop || $.os.kindle) {
                 this.layer.style.height = "100%";
             } else if ($.os.android) {
                 //on some phones its immediate
@@ -378,7 +375,7 @@
         },
 
         onTouchStart: function(e) {
-            //setup initial touch position
+            //setup initial touch position            
             this.dX = e.touches[0].pageX;
             this.dY = e.touches[0].pageY;
             this.lastTimestamp = e.timeStamp;
@@ -406,9 +403,7 @@
             if (requirePanning || $.feat.nativeTouchScroll) this.checkDOMTree(e.target, this.layer);
             //scrollend check
             if (this.isScrolling) {
-
                 //remove prev timeout
-
                 if (this.scrollTimeout_ !== null) {
                     clearTimeout(this.scrollTimeout_);
                     this.scrollTimeout_ = null;
@@ -416,18 +411,16 @@
                     if (this.scrollTimeoutEl_ !== this.scrollingEl_) this.scrollEnded(false);
                     else this.blockPossibleClick_ = true;
                     //check if event was already set
-
-                } else  {
+                } else if (this.scrollTimeoutEl_) {
                     //trigger
                     this.scrollEnded(true);
-                    this.blockPossibleClick_ = false;
+                    this.blockPossibleClick_ = true;
                 }
-
             }
 
             // We allow forcing native tap in android devices (required in special cases)
             var forceNativeTap = ($.os.android && e && e.target && e.target.getAttribute && e.target.getAttribute("data-touchlayer") === "ignore");
-
+            
             //if on edit mode, allow all native touches
             //(BB10 must still be prevented, always clicks even after move)
             if (forceNativeTap || (this.isFocused_ && !$.os.blackberry10)) {
@@ -479,7 +472,6 @@
         ignoreScrolling: function(el) {
             if (el.scrollWidth === undefined || el.clientWidth === undefined) return true;
             if (el.scrollHeight === undefined || el.clientHeight === undefined) return true;
-
             return false;
         },
 
@@ -508,6 +500,7 @@
 
             //check native scroll
             if ($.feat.nativeTouchScroll) {
+
                 //prevent errors
                 if (this.ignoreScrolling(el)) {
                     return;
@@ -521,12 +514,10 @@
                     this.isScrolling = true;
                     return;
                 } else if (this.allowsHorizontalScroll(el, styles)) {
-
                     this.isScrollingVertical_ = false;
                     this.scrollingEl_ = null;
                     this.isScrolling = true;
                 }
-
             }
             //check recursive up to top element
             var isTarget = (el === parentTarget);
@@ -592,7 +583,6 @@
             //don't allow document scroll unless a specific click demands it further ahead
             if (!$.os.ios || !this.requiresNativeTap) this.allowDocumentScroll_ = false;
 
-
             //panning action
             if (this.isPanning_ && itMoved) {
                 //wait 2 secs and cancel
@@ -611,7 +601,6 @@
 
                 //fire click
                 if (!this.blockClicks && !this.blockPossibleClick_) {
-
                     var theTarget = e.target;
                     var changedTouches = e.changedTouches ? e.changedTouches[0] : e.touches[0];
                     if (theTarget.nodeType === 3) theTarget = theTarget.parentNode;

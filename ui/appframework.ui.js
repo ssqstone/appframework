@@ -112,7 +112,7 @@
                     that.backButtonText = "Back";
                 } else if ($.os.ios7){
                     $("#afui").addClass("ios7");
-
+                   
                 } else if ($.os.ios)
                     $("#afui").addClass("ios");
                 else if($.os.tizen)
@@ -695,7 +695,7 @@
          * @param {boolean=} force
          * @param {function=} callback Callback function to execute after menu toggle is finished
          * @param {number=} time Time to run the transition
-         * @param {boolean=} aside
+         * @param {boolean=} aside 
          * @title $.ui.toggleSideMenu([force],[callback],[time])
          */
         toggleLeftSideMenu: function(force, callback, time, aside) {
@@ -1019,7 +1019,7 @@
                 this.prevHeader = elems;
             }
         },
-        /**
+        /** 
          * @api private
          */
         previAsideMenu:null,
@@ -1164,7 +1164,7 @@
          */
         modalReference_:null,
         /**
-         * Load a content panel in a modal window.
+         * Load a content panel in a modal window. 
            ```
            $.ui.showModal("#myDiv","fade");
            ```
@@ -1264,7 +1264,6 @@
             var self = this;
             var $cnt=$.query("#modalContainer");
 
-            if(!this.modalReference_) return;
             var useScroller = this.scrollingDivs.hasOwnProperty(this.modalReference_.attr("id"));
 
 
@@ -1287,7 +1286,7 @@
                     $(self.modalReference_.get(0).childNodes[0]).append($cnt.children().eq(0).contents());
                     self.modalReference_.children().eq(0).append($("#modalFooter footer"));
                 }
-                self.modalReference_=null;
+
                // $cnt.html("", true);
             },this.transitionTime);
         },
@@ -1319,12 +1318,10 @@
             } else {
                 $.cleanUpContent(el, false, true);
                 $(el).html(content);
+                var scr=this.scrollingDivs[el.id];
+                if(scr&&scr.refresh)
+                    scr.addPullToRefresh();
             }
-
-            var scr=this.scrollingDivs[el.id];
-            if(scr&&scr.refresh)
-                scr.addPullToRefresh();
-
             if (newDiv.getAttribute("data-title"))
                 el.setAttribute("data-title",newDiv.getAttribute("data-title"));
         },
@@ -1349,7 +1346,7 @@
          * @param {string} content
          * @param {string} title
          * @param {boolean=} refresh Enable refresh on pull
-         * @param {function=} refreshFunc
+         * @param {function=} refreshFunc 
          * @title $.ui.addContentDiv(id, content, title);
          */
         addContentDiv: function(el, content, title, refresh, refreshFunc) {
@@ -1471,10 +1468,7 @@
                     $(tmp).addClass("x-scroll");
                 if (refreshFunc)
                     $.bind(this.scrollingDivs[scrollEl.id], "refresh-release", function(trigger) {
-                        if (trigger) {
-                            refreshFunc();
-                            return false;
-                        }
+                        if (trigger) refreshFunc();
                     });
                 if(jsScroll){
                     $(tmp).children().eq(0).addClass("afScrollPanel");
@@ -1849,64 +1843,44 @@
             }
 
             anchor = anchor || document.createElement("a");
-            this.ajaxUrl = target;
-            var newtarget = this.useAjaxCacheBuster ? target + (target.split("?")[1] ? "&" : "?") + "cache=" + Math.random() * 10000000000000000 : target;
-
-            $.ajax({
-                url: newtarget,
-                success:function(responseText){
-                    that.doingTransition = false;
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                    this.doingTransition = false;
                     var refreshFunction;
                     var doReturn = false;
                     var retainDiv = $.query("#" + urlHash);
-                    var contentClasses = '';
-
-                    var hideRefresh = function(scrid) {
-                        var scr = that.scrollingDivs[scrid];
-                        if (scr && scr.refresh)
-                            scr.hideRefresh();
-                    };
-
                     //Here we check to see if we are retaining the div, if so update it
                     if (retainDiv.length > 0) {
-                        hideRefresh(urlHash);
-                        that.updatePanel(urlHash, responseText);
+                        that.updatePanel(urlHash, xmlhttp.responseText);
                         retainDiv.get(0).setAttribute("data-title",anchor.title ? anchor.title : target);
                     } else if (anchor.getAttribute("data-persist-ajax") || that.isAjaxApp) {
 
                         var refresh = (anchor.getAttribute("data-pull-scroller") === "true") ? true : false;
                         refreshFunction = refresh ? function() {
-                            setTimeout(function() {
-                                anchor.refresh = true;
-                                that.loadContent(target, newTab, back, transition, anchor);
-                                anchor.refresh = false;
-                            }, 500);
+                            anchor.refresh = true;
+                            that.loadContent(target, newTab, back, transition, anchor);
+                            anchor.refresh = false;
                         } : null;
-                        //that.addContentDiv(urlHash, responseText, refresh, refreshFunction);
-                        var contents = $(responseText);
+                        //that.addContentDiv(urlHash, xmlhttp.responseText, refresh, refreshFunction);
+                        var contents = $(xmlhttp.responseText);
 
-                        if (contents.hasClass("panel")) {
-                            contentClasses = contents.get(0).className;
+                        if (contents.hasClass("panel"))
+                        {
                             urlHash=contents.attr("id");
                             contents = contents.get(0).innerHTML;
                         }
-                        else {
-                            contentClasses = contents.className;
+                        else
                             contents = contents.html();
-                        }
-
-                        hideRefresh(urlHash);
-
                         if ($("#" + urlHash).length > 0) {
                             that.updatePanel("#" + urlHash, contents);
                         } else if ($("div.panel[data-crc='" + urlHash + "']").length > 0) {
                             that.updatePanel($("div.panel[data-crc='" + urlHash + "']").get(0).id, contents);
                             urlHash = $("div.panel[data-crc='" + urlHash + "']").get(0).id;
                         } else
-                            urlHash = that.addContentDiv(urlHash, responseText, anchor.title ? anchor.title : target, refresh, refreshFunction);
+                            urlHash = that.addContentDiv(urlHash, xmlhttp.responseText, anchor.title ? anchor.title : target, refresh, refreshFunction);
                     } else {
 
-                        that.updatePanel("afui_ajax", responseText);
+                        that.updatePanel("afui_ajax", xmlhttp.responseText);
                         $.query("#afui_ajax").attr("data-title",anchor.title ? anchor.title : target);
                         that.loadContent("#afui_ajax", newTab, back, transition);
 
@@ -1915,7 +1889,7 @@
                     //Let's load the content now.
                     //We need to check for any script tags and handle them
                     var div = document.createElement("div");
-                    $(div).html(responseText);
+                    $(div).html(xmlhttp.responseText);
 
                     that.parseScriptTags(div);
 
@@ -1924,23 +1898,19 @@
                         return;
                     }
 
-                    if (contentClasses){
-                        var contentClassList = contentClasses.split(" ");
-                        for (var i=0; i < contentClassList.length; i++){
-                            if (contentClassList[i].trim() !== "panel"){
-                                $("#" + urlHash).addClass(contentClassList[i]);
-                            }
-                        }
-                    }
-
                     that.loadContent("#" + urlHash, newTab, back, transition);
                     if (that.showLoading) that.hideMask();
                     return null;
-                },
-                error:function(){
+                }
+                else if(xmlhttp.readyState === 4) {
                     $.ui.hideMask();
                 }
-            });
+            };
+            this.ajaxUrl = target;
+            var newtarget = this.useAjaxCacheBuster ? target + (target.split("?")[1] ? "&" : "?") + "cache=" + Math.random() * 10000000000000000 : target;
+            xmlhttp.open("GET", newtarget, true);
+            xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            xmlhttp.send();
             // show Ajax Mask
             if (this.showLoading) this.showMask();
         },
@@ -2003,7 +1973,7 @@
                 enterEditEl = el;
             });
             //enter-edit-reshape panel padding and scroll adjust
-            if($.os.android)
+            if($.os.android&&!$.os.androidICS)
             {
                 $.bind($.touchLayer, "enter-edit-reshape", function() {
                     //onReshape UI fixes
@@ -2011,21 +1981,11 @@
                     var jQel = $(enterEditEl);
                     var jQactive = jQel.closest(that.activeDiv);
                     if (jQactive && jQactive.size() > 0) {
-                        if($.os.androidICS){
-                            //get the top
-                            var scroller=that.scrollingDivs[that.activeDiv.id];
-                            var top=scroller.scrollTop;
-                            scroller.scrollBy({
-                                x:0,
-                                y:((jQel.offset().top-jQactive.offset().top+top)/2)
-                            });
-                        } else if ($.os.android || $.os.blackberry) {
-                            var elPos = jQel.offset();
-                            var containerPos = jQactive.offset();
-                            if (elPos.bottom > containerPos.bottom && elPos.height < containerPos.height) {
-                                //apply fix
-                                that.scrollingDivs[that.activeDiv.id].scrollToItem(jQel, 'bottom');
-                            }
+                        var elPos = jQel.offset();
+                        var containerPos = jQactive.offset();
+                        if (elPos.bottom > containerPos.bottom && elPos.height < containerPos.height) {
+                            //apply fix
+                            that.scrollingDivs[that.activeDiv.id].scrollToItem(jQel, "bottom");
                         }
                     }
                 });
@@ -2353,7 +2313,7 @@
                 x: "0%",
                 y: 0
             });
-            that.finishTransition(oldDiv,currDiv);
+            that.finishTransition(oldDiv);
             currDiv.style.zIndex = 2;
             oldDiv.style.zIndex = 1;
         },
@@ -2361,7 +2321,7 @@
          * This must be called at the end of every transition to hide the old div and reset the doingTransition variable
          *
          * @param {object} oldDiv Div that transitioned out
-         * @param {object=} currDiv
+         * @param {object=} currDiv 
          * @title $.ui.finishTransition(oldDiv)
          */
         finishTransition: function(oldDiv, currDiv) {

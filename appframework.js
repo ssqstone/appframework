@@ -865,12 +865,8 @@ if (!window.af || typeof(af) !== "function") {
             */
             removeProp: function(prop) {
                 var removePropFn=function(param) {
-                    try {
-                        if (that[i][param]) {
-                            that[i][param] = undefined;
-                        }
-                    } catch(e) {}
-
+                    if (that[i][param])
+                        that[i][param] = undefined;
                     if (that[i].afmCacheId && _propCache[that[i].afmCacheId]) {
                         delete _propCache[that[i].afmCacheId][prop];
                     }
@@ -1096,7 +1092,7 @@ if (!window.af || typeof(af) !== "function") {
                 ```
                 $().appendTo("#foo"); //Append an object;
                 ```
-            * @param {string|Object} selector to append to
+            * @param {string|Object} selector to append to            
             * @title $().appendTo(element)
             */
             appendTo: function(selector) {
@@ -1111,7 +1107,7 @@ if (!window.af || typeof(af) !== "function") {
                 $().prependTo("#foo"); //Prepend an object;
                 ```
             * @param {string|Object} selector Selector to prepend to
-            * @return {$afm}
+            * @return {$afm} 
             * @title $().prependTo(element)
             */
             prependTo: function(selector) {
@@ -1668,7 +1664,6 @@ if (!window.af || typeof(af) !== "function") {
                 $(script).remove();
                 delete window[callbackName];
                 options.success.call(context, data);
-                options.complete.call(context, data);
             };
             if (options.url.indexOf("callback=?") !== -1) {
                 script.src = options.url.replace(/=\?/, "=" + callbackName);
@@ -1890,7 +1885,6 @@ if (!window.af || typeof(af) !== "function") {
                         xhr.onreadystatechange = empty;
                         xhr.abort();
                         settings.error.call(context, xhr, "timeout");
-                        settings.complete.call(context, xhr, "timeout");
                     }, settings.timeout);
                 xhr.send(settings.data);
             } catch (e) {
@@ -1962,9 +1956,9 @@ if (!window.af || typeof(af) !== "function") {
         */
         $.getJSON = function(url, data, success,error) {
             if (typeof(data) === "function") {
-                error=success;
-                success=data;
+                success = data;
                 data = {};
+                error=success;
             }
             return this.ajax({
                 url: url,
@@ -2095,7 +2089,7 @@ if (!window.af || typeof(af) !== "function") {
          * .os.tizen
          * .feat.nativeTouchScroll
          *
-         * @param {Object} $
+         * @param {Object} $ 
          * @param {string} userAgent
          * @api private
          */
@@ -2107,7 +2101,6 @@ if (!window.af || typeof(af) !== "function") {
             $.os.ipad = userAgent.match(/(iPad).*OS\s([\d_]+)/) ? true : false;
             $.os.iphone = !$.os.ipad && userAgent.match(/(iPhone\sOS)\s([\d_]+)/) ? true : false;
             $.os.ios7 = ($.os.ipad||$.os.iphone)&&userAgent.match(/7_/)||($.os.ipad||$.os.iphone)&&userAgent.match(/8_/) ? true : false;
-
             $.os.webos = userAgent.match(/(webOS|hpwOS)[\s\/]([\d.]+)/) ? true : false;
             $.os.touchpad = $.os.webos && userAgent.match(/TouchPad/) ? true : false;
             $.os.ios = $.os.ipad || $.os.iphone;
@@ -2129,10 +2122,6 @@ if (!window.af || typeof(af) !== "function") {
             $.feat.cssPrefix = $.os.webkit ? "Webkit" : $.os.fennec ? "Moz" : $.os.ie ? "ms" : $.os.opera ? "O" : "";
             $.feat.cssTransformStart = !$.os.opera ? "3d(" : "(";
             $.feat.cssTransformEnd = !$.os.opera ? ",0)" : ")";
-            if($.os.ios) {
-                if(Promise&&Promise.toString().indexOf("native")!==-1)
-                    $.os.ios7=true;
-            }
             if ($.os.android && !$.os.webkit)
                 $.os.android = false;
             var items=["Webkit","Moz","ms","O"];
@@ -2634,7 +2623,7 @@ if (!window.af || typeof(af) !== "function") {
 
         * @param {String|Object} event
         * @param {String|Array|Object} selector
-        * @param {Function()=} [optional] callback
+        * @param {Function()=} [optional] callback 
         * @return {Object} appframework object
         * @title $().off(event, selector, [callback])
         */
@@ -2844,7 +2833,7 @@ if (!window.af || typeof(af) !== "function") {
            $.cleanUpContent(node, itself, kill)
            ```
          * @param {HTMLNode} node
-         * @param {boolean} itself
+         * @param {boolean} itself 
          * @param {boolean=} kill When set to true, this will emit a non-bubbling "destroy" Event on the node
          * @title $.cleanUpContent(node,itself,kill)
          */
