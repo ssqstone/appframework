@@ -65,8 +65,8 @@
     }
 
 
-
-    var redirectMouseToTouch = function (type, originalEvent, newTarget,skipPrevent) {
+    var redirectMouseToTouch = function (type, originalEvent, newTarget, skipPrevent, offsetY) {
+        offsetY = offsetY || 0;
 
         var theTarget = newTarget ? newTarget : originalEvent.target;
         if(!skipPrevent)
@@ -75,14 +75,14 @@
         var touchevt = document.createEvent("MouseEvent");
 
         touchevt.initEvent(type, true, true);
-        touchevt.initMouseEvent(type, true, true, window, originalEvent.detail, originalEvent.screenX, originalEvent.screenY, originalEvent.clientX, originalEvent.clientY, originalEvent.ctrlKey, originalEvent.shiftKey, originalEvent.altKey, originalEvent.metaKey, originalEvent.button, originalEvent.relatedTarget);
-        touchevt.touches=  new TouchList();
+        touchevt.initMouseEvent(type, true, true, window, originalEvent.detail, originalEvent.screenX, originalEvent.screenY + offsetY, originalEvent.clientX, originalEvent.clientY + offsetY, originalEvent.ctrlKey, originalEvent.shiftKey, originalEvent.altKey, originalEvent.metaKey, originalEvent.button, originalEvent.relatedTarget);
+        touchevt.touches = new TouchList();
         touchevt.changedTouches = new TouchList();
         touchevt.targetTouches = new TouchList();
-        var thetouch=new Touch();
-        thetouch.pageX=originalEvent.pageX;
-        thetouch.pageY=originalEvent.pageY;
-        thetouch.target=originalEvent.target;
+        var thetouch = new Touch();
+        thetouch.pageX = originalEvent.pageX;
+        thetouch.pageY = originalEvent.pageY + offsetY;
+        thetouch.target = originalEvent.target;
         touchevt.changedTouches._add(thetouch);
         if (type !== "touchend") {
             touchevt.touches = touchevt.changedTouches;
@@ -165,6 +165,33 @@
 
         }, true);
     }
+
+    var scrollFunc = function (e) {
+        e = e || window.event;
+        var val = e.wheelDelta || -e.detail || 0;
+        val = +val;
+        if (val != 0) {
+            lastTarget = e.target;
+            if (e.target.nodeName.toLowerCase() === "a" && e.target.href.toLowerCase() === "javascript:;")
+                e.target.href = "#";
+            redirectMouseToTouch("touchstart", e);
+            cancelClickMove = false;
+            prevX = e.clientX;
+            prevY = e.clientY;
+
+            redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 2 : -2);
+            cancelClickMove = true;
+
+            redirectMouseToTouch("touchmove", e, lastTarget, false, val > 0 ? 4 : -4);
+            cancelClickMove = true;
+
+            redirectMouseToTouch("touchend", e, lastTarget, false, val); //bind it to initial mousedown target
+            lastTarget = null;
+        }
+    }
+    /*register event*/
+    document.addEventListener('DOMMouseScroll', scrollFunc, false);
+    window.onmousewheel = document.onmousewheel = scrollFunc;//IE/Opera/Chrome/Safari
 
     // prevent all mouse events which don't exist on touch devices
     document.addEventListener("drag", preventAll, true);
