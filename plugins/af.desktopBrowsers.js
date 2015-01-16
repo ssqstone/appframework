@@ -10,13 +10,13 @@
     "use strict";
     var cancelClickMove = false;
     //See if we can create a touch event
-    var tmp;
-    try {
-        tmp = document.createEvent("TouchEvent");
-        return;
-    } catch (ex) {
-
-    }
+    //var tmp;
+    //try {
+    //    tmp = document.createEvent("TouchEvent");
+    //    return;
+    //} catch (ex) {
+    //
+    //}
     $.os.supportsTouch=true;
     var preventAll = function (e) {
         e.preventDefault();
